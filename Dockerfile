@@ -34,5 +34,7 @@ RUN chmod 600 /root/.ssh/id_rsa \
 # Add GitHub to known hosts
 RUN ssh-keyscan -t rsa github.com >> /root/.ssh/known_hosts
 
+RUN pip install -r requirements.txt
+
 # Default command to start an interactive bash shell
 CMD ["/bin/bash"]
