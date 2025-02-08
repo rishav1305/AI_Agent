@@ -1,0 +1,1 @@
+pip install -qqq wordcloud beautifulsoup4 matplotlib requests

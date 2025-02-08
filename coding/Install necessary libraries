@@ -1,0 +1,2 @@
+# Install necessary libraries
+pip install -qqq wordcloud beautifulsoup4 matplotlib requests
