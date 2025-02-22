@@ -1,1 +1,6 @@
-openai
+jupyterlab 
+pandas 
+numpy 
+matplotlib 
+seaborn
+
