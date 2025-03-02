@@ -1,6 +1,8 @@
 import configparser
 import colorama
 from colorama import Fore, Style
+from autogen_ext.models.openai import OpenAIChatCompletionClient
+
 
 # Initialize colorama for cross-platform color support
 colorama.init(autoreset=True)
@@ -62,4 +64,36 @@ def run_tests(testcases, test_function):
     print(f"{Fore.GREEN}Passed: {passed_tests}{Style.RESET_ALL}")
     print(f"{Fore.RED}Failed: {total_tests - passed_tests}{Style.RESET_ALL}")
 
+
+def get_model_client(model_name):
+
+    if model_name == 'deepseek':
+        model_client = OpenAIChatCompletionClient(
+            model="deepseek-r1:14b",
+            base_url="http://localhost:11434/v1",
+            api_key="placeholder",
+            model_info={
+                "vision": False,
+                "function_calling": False,
+                "json_output": False,
+                "family": "unknown",
+            },
+        )
+
+    elif model_name =='llama':
+        model_client = OpenAIChatCompletionClient(
+            model="llama3.2",
+            base_url="http://localhost:11434/v1",
+            api_key="placeholder",
+            model_info={
+                "vision": False,
+                "function_calling": True,
+                "json_output": False,
+                "family": "unknown",
+            },
+        )
+    else:
+        raise "Unknown model name mentioned."
+    
+    return model_client
     
