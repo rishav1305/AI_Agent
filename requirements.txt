@@ -10,5 +10,6 @@ ag2[ollama]
 ollama
 colorama
 autogen-agentchat
-autogen-ext[openai,azure]
+
+
 
