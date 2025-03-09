@@ -1,34 +1,42 @@
-import venv
-from pathlib import Path
+import tempfile
 import asyncio
-
 from autogen_core import CancellationToken
-from autogen_core.code_executor import CodeBlock
+from autogen_core.code_executor import with_requirements, CodeBlock
 from autogen_ext.code_executors.local import LocalCommandLineCodeExecutor
+import pandas
 
+@with_requirements(python_packages=["pandas"], global_imports=["pandas"])
+def load_data() -> pandas.DataFrame:
+    """Load some sample data.
 
-async def example():
-    work_dir = Path("coding")
-    work_dir.mkdir(exist_ok=True)
+    Returns:
+        pandas.DataFrame: A DataFrame with sample data
+    """
+    data = {
+        "name": ["John", "Anna", "Peter", "Linda"],
+        "location": ["New York", "Paris", "Berlin", "London"],
+        "age": [24, 13, 53, 33],
+    }
+    return pandas.DataFrame(data)
 
-    venv_dir = work_dir / ".venv"
-    venv_builder = venv.EnvBuilder(with_pip=True)
-    venv_builder.create(venv_dir)
-    venv_context = venv_builder.ensure_directories(venv_dir)
+async def run_example():
+    # The decorated function can be used in executed code
+    with tempfile.TemporaryDirectory() as temp_dir:
+        executor = LocalCommandLineCodeExecutor(work_dir=temp_dir, functions=[load_data])
+        code = f"""
+from {executor.functions_module} import load_data
 
-    local_executor = LocalCommandLineCodeExecutor(work_dir=work_dir, virtual_env_context=venv_context)
-
-    code = """
-    import pandas as pd
-    df = pd.DataFrame([1,2], columns=['a', 'b'])
-    df.to_csv()
+# Use the imported function
+data = load_data()
+print(data['name'][0])
+data.to_csv('test.csv')
 """
-    await local_executor.execute_code_blocks(
-        code_blocks=[
-            CodeBlock(language="python", code=code),
-        ],
-        cancellation_token=CancellationToken(),
-    )
 
+        result = await executor.execute_code_blocks(
+            code_blocks=[CodeBlock(language="python", code=code)],
+            cancellation_token=CancellationToken(),
+        )
+        print(result.output)  # Output: John
 
-asyncio.run(example())
+# Run the async example
+asyncio.run(run_example())
